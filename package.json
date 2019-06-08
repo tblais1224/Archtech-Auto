@@ -1,0 +1,19 @@
+{
+  "name": "arctechauto",
+  "version": "1.0.0",
+  "description": "A website for people to sell electric vehicles of any type. (cars, motorcycles, bicycles, scooters, etc.) Their will be a forum to add posts and comments to allow an interactive community, also their will be a parts/merchandise section on the site. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tblais1224/Archtech-Auto.git"
+  },
+  "author": "tblais1224",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tblais1224/Archtech-Auto/issues"
+  },
+  "homepage": "https://github.com/tblais1224/Archtech-Auto#readme"
+}
