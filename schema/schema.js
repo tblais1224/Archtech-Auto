@@ -5,7 +5,8 @@ const Profile = require("../models/Profile")
 const Selling = require("../models/Selling")
 const Post = require("../models/Post")
 const Comment = require("../models/Comment")
-const Likes = require("../models/Like")
+const Like = require("../models/Like")
+const Wishlist = require("../models/Wishlist")
 
 const {
     GraphQLSchema,
@@ -65,13 +66,13 @@ const ProfileType = new GraphQLObjectType({
             type: SellingType,
             resolve(parent, args) {
                 //parent returns the Profile data in this case
-                return Selling.findById(parent.sellingId);
+                return Selling.find(parent.id);
             }
         },
         post: {
             type: PostType,
             resolve(parent, args) {
-                return Post.findById(parent.postId);
+                return Post.find(parent.id);
             }
         },
         user: {
@@ -89,11 +90,41 @@ const SellingType = new GraphQLObjectType({
         id: {
             type: GraphQLID
         },
-        name: {
+        model: {
             type: GraphQLString
+        },
+        manufacturer: {
+            type: GraphQLString
+        },
+        mileage: {
+            type: GraphQLInt
+        },
+        hours: {
+            type: GraphQLInt
         },
         price: {
             type: GraphQLInt
+        },
+        condition: {
+            type: GraphQLString
+        },
+        chargeTime: {
+            type: GraphQLString
+        },
+        range: {
+            type: GraphQLString
+        },
+        drive: {
+            type: GraphQLString
+        },
+        acceleration: {
+            type: GraphQLString
+        },
+        topSpeed: {
+            type: GraphQLString
+        },
+        color: {
+            type: GraphQLString
         },
         description: {
             type: GraphQLString
@@ -109,14 +140,14 @@ const SellingType = new GraphQLObjectType({
                 });
             }
         },
-        watching: [{
-            user: {
-                type: UserType,
-                resolve(parent, args) {
-                    return User.findById(parent.userId);
-                }
+        likes: {
+            type: new GraphQLList(LikeType),
+            resolve(parent, args) {
+                return Like.find({
+                    sellingId: parent.id
+                });
             }
-        }],
+        },
         date: {
             type: GraphQLDate
         },
@@ -144,35 +175,125 @@ const PostType = new GraphQLObjectType({
         date: {
             type: GraphQLDate
         },
-        comments: [{
-            user: {
-                type: UserType,
-                resolve(parent, args) {
-                    return User.findById(parent.userId);
-                }
-            },
-            text: {
-                type: GraphQLString
-            },
-            name: {
-                type: GraphQLString
-            },
-            date: {
-                type: GraphQLDate
-            },
-        }],
-        likes: [{
-            user: {
-                type: UserType,
-                resolve(parent, args) {
-                    return User.findById(parent.userId);
-                }
+        comments: {
+            type: new GraphQLList(CommentType),
+            resolve(parent, args) {
+                return Comment.find({
+                    postId: parent.id
+                });
             }
-        }],
+        },
+        likes: {
+            type: new GraphQLList(LikeType),
+            resolve(parent, args) {
+                return Like.find({
+                    postId: parent.id
+                });
+            }
+        },
         user: {
             type: UserType,
             resolve(parent, args) {
                 return User.findById(parent.userId);
+            }
+        },
+    })
+});
+
+const CommentType = new GraphQLObjectType({
+    name: "Comment",
+    fields: () => ({
+        id: {
+            type: GraphQLID
+        },
+        name: {
+            type: GraphQLString
+        },
+        text: {
+            type: GraphQLString
+        },
+        date: {
+            type: GraphQLDate
+        },
+        user: {
+            type: UserType,
+            resolve(parent, args) {
+                return User.findById(parent.userId);
+            }
+        },
+        post: {
+            type: PostType,
+            resolve(parent, args) {
+                return Post.findById(parent.postId);
+            }
+        },
+        selling: {
+            type: SellingType,
+            resolve(parent, args) {
+                return Selling.findById(parent.sellingId);
+            }
+        },
+    })
+});
+
+const LikeType = new GraphQLObjectType({
+    name: "Like",
+    fields: () => ({
+        id: {
+            type: GraphQLID
+        },
+        date: {
+            type: GraphQLDate
+        },
+        user: {
+            type: UserType,
+            resolve(parent, args) {
+                return User.findById(parent.userId);
+            }
+        },
+        post: {
+            type: PostType,
+            resolve(parent, args) {
+                return Post.findById(parent.postId);
+            }
+        },
+        selling: {
+            type: SellingType,
+            resolve(parent, args) {
+                return Selling.findById(parent.sellingId);
+            }
+        },
+    })
+});
+
+const WishlistType = new GraphQLObjectType({
+    name: "Wishlist",
+    fields: () => ({
+        id: {
+            type: GraphQLID
+        },
+        date: {
+            type: GraphQLDate
+        },
+        user: {
+            type: UserType,
+            resolve(parent, args) {
+                return User.findById(parent.userId);
+            }
+        },
+        model: {
+            type:GraphQLString
+        },
+        manufacturer: {
+            type:GraphQLString
+        },
+        type: {
+            type:GraphQLString
+        },
+        selling: {
+            type: SellingType,
+            resolve(parent, args) {
+                return Selling.findById(parent.sellingId);
             }
         },
     })
