@@ -8,9 +8,6 @@ const ProfileSchema = new Schema({
         required: true,
         max: 30
     },
-    skills: {
-        type: [String]
-    },
     bio: {
         type: String,
     },
@@ -25,23 +22,9 @@ const ProfileSchema = new Schema({
         type: String,
         required: true
     },
-    wishlist: [{
-        item: {
-            type: String,
-            required: true
-        },
-        manufacturer: {
-            type: String,
-            required: true
-        },
-        description: {
-            type: String
-        },
-        price: {
-            type: Number,
-            required: true
-        }
-    }],
+    wishlistId: {
+        type: String
+    },
     date: {
         type: Date,
         default: Date.now

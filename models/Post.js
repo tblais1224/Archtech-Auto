@@ -6,7 +6,8 @@ const Schema = mongoose.Schema;
 //create Schema
 const PostSchema = new Schema({
     userId: {
-        type: String
+        type: String,
+        required: true
     },
     text: {
         type: String,
@@ -15,28 +16,12 @@ const PostSchema = new Schema({
     name: {
         type: String
     },
-    //if like post the user id is stored in array for the post
-    likes: [{
-        userId: {
-            type: String
-        },
-    }],
-    comments: [{
-        userId: {
-            type: String
-        },
-        text: {
-            type: String,
-            required: true
-        },
-        name: {
-            type: String
-        },
-        date: {
-            type: Date,
-            default: Date.now
-        }
-    }],
+    likeId: {
+        type: String
+    },
+    commentId: {
+        type: String
+    },
     date: {
         type: Date,
         default: Date.now

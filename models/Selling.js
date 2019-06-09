@@ -3,9 +3,18 @@ const Schema = mongoose.Schema;
 
 const SellingSchema = new Schema({
     userId: {
-        type: String
+        type: String,
+        required: true
     },
-    name: {
+    type: {
+        type: String,
+        required: true
+    },
+    model: {
+        type: String,
+        required: true
+    },
+    manufacturer: {
         type: String,
         required: true
     },
@@ -13,34 +22,46 @@ const SellingSchema = new Schema({
         type: Number,
         required: true
     },
+    mileage: {
+        type: Number,
+    },
+    hours: {
+        type: Number,
+    },
+    condition: {
+        type: String
+    },
+    chargeTime: {
+        type: String
+    },
+    range: {
+        type: String
+    },
+    drive: {
+        type: String
+    },
+    //0 to 60 time
+    acceleration: {
+        type: String
+    },
+    topSpeed: {
+        type: String
+    },
     description: {
-        type: String,
-        required: true
+        type: String
     },
     location: {
         type: String,
     },
-    comments: [{
-        userId: {
-            type: String
-        },
-        text: {
-            type: String,
-            required: true
-        },
-        name: {
-            type: String
-        },
-        date: {
-            type: Date,
-            default: Date.now
-        }
-    }],
-    watching: [{
-        userId: {
-            type: String
-        },
-    }],
+    color: {
+        type: String
+    },
+    commentId: {
+        type: String
+    },
+    likeId: {
+        type: String
+    },
     date: {
         type: Date,
         default: Date.now

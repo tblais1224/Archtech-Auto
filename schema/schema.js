@@ -5,7 +5,7 @@ const Profile = require("../models/Profile")
 const Selling = require("../models/Selling")
 const Post = require("../models/Post")
 const Comment = require("../models/Comment")
-const Likes = require("../models/Likes")
+const Likes = require("../models/Like")
 
 const {
     GraphQLSchema,

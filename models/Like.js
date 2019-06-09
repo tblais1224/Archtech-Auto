@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-const LikesSchema = new Schema({
+const LikeSchema = new Schema({
     userId: {
         type: String,
         required: true
@@ -20,4 +20,4 @@ const LikesSchema = new Schema({
 });
 
 
-module.exports = Post = mongoose.model("post", PostSchema)
+module.exports = Like = mongoose.model("like", LikeSchema)
