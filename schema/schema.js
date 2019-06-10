@@ -1,28 +1,21 @@
-const graphql = require("graphql")
-const _ = require("lodash");
-const User = require("../models/User")
-const Profile = require("../models/Profile")
-const Selling = require("../models/Selling")
-const Post = require("../models/Post")
-const Comment = require("../models/Comment")
-const Like = require("../models/Like")
-const Wishlist = require("../models/Wishlist")
+ const graphql = require("graphql")
+ const _ = require("lodash");
+ const User = require("../models/User")
+ const Profile = require("../models/Profile")
+ const Selling = require("../models/Selling")
+ const {GraphQLDate} = require("graphql-iso-date")
 
-const {
-    GraphQLSchema,
-    GraphQLObjectType,
-    GraphQLString,
-    GraphQLID,
-    GraphQLInt,
-    GraphQLList,
-    GraphQLNonNull
-} = graphql;
+ const {
+     GraphQLSchema,
+     GraphQLObjectType,
+     GraphQLString,
+     GraphQLID,
+     GraphQLInt,
+     GraphQLList,
+     GraphQLNonNull
+ } = graphql;
 
-const {
-    GraphQLDate
-} = require("graphql-iso-date")
-
-const UserType = new GraphQLObjectType({
+ const UserType = new GraphQLObjectType({
     name: "User",
     fields: () => ({
         id: {
@@ -47,6 +40,7 @@ const UserType = new GraphQLObjectType({
     })
 });
 
+
 const ProfileType = new GraphQLObjectType({
     name: "Profile",
     fields: () => ({
@@ -69,12 +63,12 @@ const ProfileType = new GraphQLObjectType({
                 return Selling.find(parent.id);
             }
         },
-        post: {
-            type: PostType,
-            resolve(parent, args) {
-                return Post.find(parent.id);
-            }
-        },
+        // post: {
+        //     type: PostType,
+        //     resolve(parent, args) {
+        //         return Post.find(parent.id);
+        //     }
+        // },
         user: {
             type: UserType,
             resolve(parent, args) {
@@ -83,6 +77,7 @@ const ProfileType = new GraphQLObjectType({
         },
     })
 });
+
 
 const SellingType = new GraphQLObjectType({
     name: "Selling",
@@ -132,22 +127,22 @@ const SellingType = new GraphQLObjectType({
         location: {
             type: GraphQLString
         },
-        comments: {
-            type: new GraphQLList(CommentType),
-            resolve(parent, args) {
-                return Comment.find({
-                    sellingId: parent.id
-                });
-            }
-        },
-        likes: {
-            type: new GraphQLList(LikeType),
-            resolve(parent, args) {
-                return Like.find({
-                    sellingId: parent.id
-                });
-            }
-        },
+        // comments: {
+        //     type: new GraphQLList(CommentType),
+        //     resolve(parent, args) {
+        //         return Comment.find({
+        //             sellingId: parent.id
+        //         });
+        //     }
+        // },
+        // likes: {
+        //     type: new GraphQLList(LikeType),
+        //     resolve(parent, args) {
+        //         return Like.find({
+        //             sellingId: parent.id
+        //         });
+        //     }
+        // },
         date: {
             type: GraphQLDate
         },
@@ -159,179 +154,57 @@ const SellingType = new GraphQLObjectType({
         },
     })
 });
-
-const PostType = new GraphQLObjectType({
-    name: "Post",
-    fields: () => ({
-        id: {
-            type: GraphQLID
-        },
-        name: {
-            type: GraphQLString
-        },
-        text: {
-            type: GraphQLString
-        },
-        date: {
-            type: GraphQLDate
-        },
-        comments: {
-            type: new GraphQLList(CommentType),
-            resolve(parent, args) {
-                return Comment.find({
-                    postId: parent.id
-                });
-            }
-        },
-        likes: {
-            type: new GraphQLList(LikeType),
-            resolve(parent, args) {
-                return Like.find({
-                    postId: parent.id
-                });
-            }
-        },
-        user: {
-            type: UserType,
-            resolve(parent, args) {
-                return User.findById(parent.userId);
-            }
-        },
-    })
-});
-
-const CommentType = new GraphQLObjectType({
-    name: "Comment",
-    fields: () => ({
-        id: {
-            type: GraphQLID
-        },
-        name: {
-            type: GraphQLString
-        },
-        text: {
-            type: GraphQLString
-        },
-        date: {
-            type: GraphQLDate
-        },
-        user: {
-            type: UserType,
-            resolve(parent, args) {
-                return User.findById(parent.userId);
-            }
-        },
-        post: {
-            type: PostType,
-            resolve(parent, args) {
-                return Post.findById(parent.postId);
-            }
-        },
-        selling: {
-            type: SellingType,
-            resolve(parent, args) {
-                return Selling.findById(parent.sellingId);
-            }
-        },
-    })
-});
-
-const LikeType = new GraphQLObjectType({
-    name: "Like",
-    fields: () => ({
-        id: {
-            type: GraphQLID
-        },
-        date: {
-            type: GraphQLDate
-        },
-        user: {
-            type: UserType,
-            resolve(parent, args) {
-                return User.findById(parent.userId);
-            }
-        },
-        post: {
-            type: PostType,
-            resolve(parent, args) {
-                return Post.findById(parent.postId);
-            }
-        },
-        selling: {
-            type: SellingType,
-            resolve(parent, args) {
-                return Selling.findById(parent.sellingId);
-            }
-        },
-    })
-});
-
-const WishlistType = new GraphQLObjectType({
-    name: "Wishlist",
-    fields: () => ({
-        id: {
-            type: GraphQLID
-        },
-        date: {
-            type: GraphQLDate
-        },
-        user: {
-            type: UserType,
-            resolve(parent, args) {
-                return User.findById(parent.userId);
-            }
-        },
-        model: {
-            type:GraphQLString
-        },
-        manufacturer: {
-            type:GraphQLString
-        },
-        type: {
-            type:GraphQLString
-        },
-        selling: {
-            type: SellingType,
-            resolve(parent, args) {
-                return Selling.findById(parent.sellingId);
-            }
-        },
-    })
-});
-
 
 const RootQuery = new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
-        user: {
-            type: UserType,
-            args: {
-                id: {
-                    type: GraphQLID
-                }
-            },
-            resolve(parent, args) {
-                //code to get the data from db or source of data
-                //use lodash to find id using args
-                // return _.find(Users, { id: args.id });
-                return User.findById(args.id);
-            }
-        },
-        profile: {
-            type: ProfileType,
-            args: {
-                id: {
-                    type: GraphQLID
-                }
-            },
-            resolve(parent, args) {
-                return Profile.findById(args.id);
-            }
-        },
+      user: {
+        type: UserType,
+        args: { id: { type: GraphQLID } },
+        resolve(parent, args) {
+          //code to get the data from db or source of data
+          //use lodash to find id using args
+          // return _.find(games, { id: args.id });
+          return User.findById(args.id);
+        }
+      },
+      profile: {
+        type: ProfileType,
+        args: { id: { type: GraphQLID } },
+        resolve(parent, args) {
+          return Profile.findById(args.id);
+        }
+      },
+      platform: {
+        type: PlatformType,
+        args: { id: { type: GraphQLID } },
+        resolve(parent, args) {
+          return Platform.findById(args.id);
+        }
+      },
+      games: {
+        type: new GraphQLList(GameType),
+        resolve(parent, args) {
+          //returns all games
+          return Game.find({});
+        }
+      },
+      platforms: {
+        type: new GraphQLList(PlatformType),
+        resolve(parent, args) {
+          return Platform.find({});
+        }
+      },
+      designers: {
+        type: new GraphQLList(DesignerType),
+        resolve(parent, args) {
+          return Designer.find({});
+        }
+      }
     }
-})
+  });
+  
 
-const Mutation = ""
 
 module.exports = new GraphQLSchema({
     query: RootQuery,
