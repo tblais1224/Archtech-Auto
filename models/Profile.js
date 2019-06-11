@@ -11,9 +11,9 @@ const ProfileSchema = new Schema({
     bio: {
         type: String,
     },
-    SellingId: {
-        type: String
-    },
+    // SellingId: {
+    //     type: String
+    // },
     userId: {
         type: String
     },

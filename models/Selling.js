@@ -56,12 +56,11 @@ const SellingSchema = new Schema({
         type: String
     },
     //try cloudinary
-    images: [{
-        URL: {
-            type: String
-        }
-    }
-    ],
+    // images: [{
+    //     URL: {
+    //         type: String
+    //     }
+    // }],
     date: {
         type: Date,
         default: Date.now
