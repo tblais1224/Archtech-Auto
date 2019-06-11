@@ -63,12 +63,6 @@ const ProfileType = new GraphQLObjectType({
                 return Selling.find(parent.id);
             }
         },
-        // post: {
-        //     type: PostType,
-        //     resolve(parent, args) {
-        //         return Post.find(parent.id);
-        //     }
-        // },
         user: {
             type: UserType,
             resolve(parent, args) {
@@ -127,22 +121,8 @@ const SellingType = new GraphQLObjectType({
         location: {
             type: GraphQLString
         },
-        // comments: {
-        //     type: new GraphQLList(CommentType),
-        //     resolve(parent, args) {
-        //         return Comment.find({
-        //             sellingId: parent.id
-        //         });
-        //     }
-        // },
-        // likes: {
-        //     type: new GraphQLList(LikeType),
-        //     resolve(parent, args) {
-        //         return Like.find({
-        //             sellingId: parent.id
-        //         });
-        //     }
-        // },
+        images: [ URL ]
+        ,
         date: {
             type: GraphQLDate
         },
@@ -175,30 +155,30 @@ const RootQuery = new GraphQLObjectType({
           return Profile.findById(args.id);
         }
       },
-      platform: {
-        type: PlatformType,
+      selling: {
+        type: SellingType,
         args: { id: { type: GraphQLID } },
         resolve(parent, args) {
-          return Platform.findById(args.id);
+          return Selling.findById(args.id);
         }
       },
-      games: {
+      sellings: {
         type: new GraphQLList(GameType),
         resolve(parent, args) {
           //returns all games
-          return Game.find({});
+          return Selling.find({});
         }
       },
-      platforms: {
+      profiles: {
         type: new GraphQLList(PlatformType),
         resolve(parent, args) {
-          return Platform.find({});
+          return Profile.find({});
         }
       },
-      designers: {
+      users: {
         type: new GraphQLList(DesignerType),
         resolve(parent, args) {
-          return Designer.find({});
+          return User.find({});
         }
       }
     }
@@ -208,5 +188,5 @@ const RootQuery = new GraphQLObjectType({
 
 module.exports = new GraphQLSchema({
     query: RootQuery,
-    mutation: Mutation
+    // mutation: Mutation
 });

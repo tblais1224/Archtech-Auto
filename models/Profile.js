@@ -12,17 +12,9 @@ const ProfileSchema = new Schema({
         type: String,
     },
     SellingId: {
-        type: String,
-        required: true
-    },
-    userId: {
         type: String
     },
-    postId: {
-        type: String,
-        required: true
-    },
-    wishlistId: {
+    userId: {
         type: String
     },
     date: {

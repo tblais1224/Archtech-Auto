@@ -40,7 +40,6 @@ const SellingSchema = new Schema({
     drive: {
         type: String
     },
-    //0 to 60 time
     acceleration: {
         type: String
     },
@@ -56,12 +55,13 @@ const SellingSchema = new Schema({
     color: {
         type: String
     },
-    commentId: {
-        type: String
-    },
-    likeId: {
-        type: String
-    },
+    //try cloudinary
+    images: [{
+        URL: {
+            type: String
+        }
+    }
+    ],
     date: {
         type: Date,
         default: Date.now
