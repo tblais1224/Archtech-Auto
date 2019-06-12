@@ -12,8 +12,31 @@ const Post = require("../../models/Post");
 //bring in profile model
 const Profile = require("../../models/Profile");
 
+// @route   POST /api/posts
+// @desc   Create a post
+// @access   private
+router.post(
+  "/",
+  jsonParser,
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validatePostInput(req.body);
+    //check validation
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    const newPost = new Post({
+      text: req.body.text,
+      name: req.user.name,
+      user: req.user.id
+    });
+    //save the post then return the post
+    newPost.save().then(post => res.json(post));
+  }
+);
+
 // @route   GET /api/posts
-// @desc   get posts
+// @desc   get all posts
 // @access   Public
 router.get("/", (req, res) => {
   //this finds posts and sorts them by the most recent date
@@ -34,32 +57,6 @@ router.get("/:id", (req, res) => {
       res.status(404).json({ error: "No post found with that id!" })
     );
 });
-
-// @route   POST /api/posts
-// @desc   Create a post
-// @access   private
-router.post(
-  "/",
-  jsonParser,
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    const { errors, isValid } = validatePostInput(req.body);
-    //check validation
-    if (!isValid) {
-      return res.status(400).json(errors);
-    }
-
-    const newPost = new Post({
-      text: req.body.text,
-      name: req.body.name,
-      avatar: req.body.avatar,
-      user: req.user.id
-    });
-
-    //save the post then return the post
-    newPost.save().then(post => res.json(post));
-  }
-);
 
 // @route   DELETE /api/posts/:id
 // @desc   delete a post by id
@@ -99,7 +96,7 @@ router.post(
     Profile.findOne({ user: req.user.id }).then(profile => {
       Post.findById(req.params.id)
         .then(post => {
-          //this checks to see if users id is in like array
+          //this checks to see if users id is in like array already
           if (
             post.likes.filter(like => like.user.toString() === req.user.id)
               .length > 0
@@ -166,20 +163,16 @@ router.post(
     if (!isValid) {
       return res.status(400).json(errors);
     }
-
     Post.findById(req.params.id)
       .then(post => {
         //sets comment from post data in body, and id from user id
         const newComment = {
           text: req.body.text,
-          name: req.body.name,
-          avatar: req.body.avatar,
+          name: req.user.name,
           user: req.user.id
         };
-
         // add to comments array on post
         post.comments.unshift(newComment);
-
         //save post with added comment the return post
         post.save().then(post => res.json(post));
       })
@@ -187,7 +180,7 @@ router.post(
   }
 );
 
-// @route  delete /api/posts/comment/:id
+// @route  delete /api/posts/comment/:id/:commentid
 // @desc   delete a comment from a post by id
 // @access   private
 router.delete(
@@ -199,14 +192,13 @@ router.delete(
         //check if comment does not exist in post.comments array
         if (
           post.comments.filter(
-            comment => comment._id.toString() === req.params.comment_id).length === 0
-          
+            comment => comment._id.toString() === req.params.comment_id
+          ).length === 0
         ) {
           return res
             .status(404)
             .json({ commentdoesntexist: "No comment found!" });
         }
-
         //get the index of the comment to remove by params comment_id
         const removeIndex = post.comments
           .map(item => item._id.toString())
@@ -219,12 +211,101 @@ router.delete(
   }
 );
 
-// @route   GET /api/posts/test
-// @desc   Tests posts route
-// @access   Public
-router.get("/test", (req, res) =>
-  res.json({ messaage: "Posts route is functional" })
+// @route   POST /api/posts/comment/:id/like/:commentid
+// @desc   like a comment by id
+// @access   private
+router.post(
+  "/comment/:id/like/:comment_id",
+  jsonParser,
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.id)
+        .then(post => {
+          //check if comment does not exist in post.comments array
+          if (
+            post.comments.filter(
+              comment => comment._id.toString() === req.params.comment_id
+            ).length === 0
+          ) {
+            return res
+              .status(404)
+              .json({ commentdoesntexist: "No comment found!" });
+          }
+
+          //get the index of the comment to like by params comment_id
+          const likeIndex = post.comments
+            .map(item => item._id.toString())
+            .indexOf(req.params.comment_id);
+
+          //this checks to see if users id is in like array already
+          if (
+            post.comments[likeIndex].likes.filter(
+              like => like.user.toString() === req.user.id
+            ).length > 0
+          ) {
+            return res
+              .status(400)
+              .json({ alreadyliked: "User has already liked this comment!" });
+          }
+          // add a user id to the likes array
+          post.comments[likeIndex].likes.unshift({ user: req.user.id });
+          //save post and return new updated post with added like
+          post.save().then(post => res.json(post));
+        })
+        .catch(err => res.status(404).json({ error: "No post found!" }));
+    });
+  }
 );
 
+// @route   POST /api/posts/comment/:id/unlike/:commentid
+// @desc   unlike a comment by id
+// @access   private
+router.post(
+  "/comment/:id/unlike/:comment_id",
+  jsonParser,
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.id)
+        .then(post => {
+          //check if comment does not exist in post.comments array
+          if (
+            post.comments.filter(
+              comment => comment._id.toString() === req.params.comment_id
+            ).length === 0
+          ) {
+            return res
+              .status(404)
+              .json({ commentdoesntexist: "No comment found!" });
+          }
+
+          //get the index of the comment to unlike by params comment_id
+          const unlikeIndex = post.comments
+            .map(item => item._id.toString())
+            .indexOf(req.params.comment_id);
+
+          //this checks to see if users id is not in like array
+          if (
+            post.comments[unlikeIndex].likes.filter(like => like.user.toString() === req.user.id)
+              .length === 0
+          ) {
+            return res
+              .status(400)
+              .json({ notliked: "User has not yet liked this post!" });
+          }
+          // map through like array, get index by id
+          const removeIndex = post.comments[unlikeIndex].likes
+            .map(item => item.user.toString())
+            .indexOf(req.user.id);
+          //remove from like array by index
+          post.comments[unlikeIndex].likes.splice(removeIndex, 1);
+          //save post, then return it
+          post.save().then(post => res.json(post));
+        })
+        .catch(err => res.status(404).json({ error: "No post found!" }));
+    });
+  }
+);
 
 module.exports = router;

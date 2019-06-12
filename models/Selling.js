@@ -6,6 +6,10 @@ const SellingSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "users"
   },
+  name: {
+    type: String,
+    required: true
+  },
   type: {
     type: String,
     required: true
