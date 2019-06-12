@@ -32,9 +32,9 @@ require("./config/passport")(passport);
 
 //api routes
 app.use("/api/users", users);
-app.use("/api/profiles", profiles);
-app.use("/api/posts", posts);
-app.use("/api/sellings", sellings);
+// app.use("/api/profiles", profiles);
+// app.use("/api/posts", posts);
+// app.use("/api/sellings", sellings);
 
 //the below code is needed to run in production with react build / heroku
 if (process.env.NODE_ENV === "production") {
