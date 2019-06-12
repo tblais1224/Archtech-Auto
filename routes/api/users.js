@@ -16,13 +16,6 @@ const jsonParser = bodyParser.json();
 //Load user model
 const User = require("../../models/User");
 
-// @route   GET /api/users/test
-// @desc   Tests users route
-// @access   Public
-router.get("/test", (req, res) =>
-  res.json({ message: "Users route is functional" })
-);
-
 // @route   POST /api/users/register
 // @desc   Register user
 // @access   Public
@@ -128,5 +121,14 @@ router.get(
     });
   }
 );
+
+
+// @route   GET /api/users/test
+// @desc   Tests users route
+// @access   Public
+router.get("/test", (req, res) =>
+  res.json({ message: "Users route is functional" })
+);
+
 
 module.exports = router;
