@@ -43,6 +43,7 @@ export const loginUser = userData => dispatch => {
 };
 
 //set the logged in user
+//decoded is the user data from the jwt token
 export const setCurrentUser = (decoded) => {
     return {
         type: SET_CURRENT_USER,
