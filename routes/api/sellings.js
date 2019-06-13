@@ -7,6 +7,7 @@ const jsonParser = bodyParser.json();
 
 //post validation
 const validateSellingInput = require("../../validation/selling");
+const validatePostInput = require("../../validation/post");
 //bring in selling model
 const Selling = require("../../models/Selling");
 //bring in profile model
@@ -58,7 +59,11 @@ router.get("/", (req, res) => {
   Selling.find()
     .sort({ date: -1 })
     .then(sellings => res.json(sellings))
-    .catch(err => res.status(404).json({ error: "No one seems to be selling at this time." }));
+    .catch(err =>
+      res
+        .status(404)
+        .json({ error: "No one seems to be selling at this time." })
+    );
 });
 
 // @route   GET /api/selling/:id
@@ -100,72 +105,72 @@ router.delete(
   }
 );
 
-// @route   POST /api/selling/like/:id
-// @desc   like a post by id
+// @route   POST /api/selling/watching/:id
+// @desc   watch a item by id
 // @access   private
 router.post(
-  "/like/:id",
+  "/watching/:id",
   jsonParser,
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Profile.findOne({ user: req.user.id }).then(profile => {
-      Post.findById(req.params.id)
-        .then(post => {
+      Selling.findById(req.params.id)
+        .then(selling => {
           //this checks to see if users id is in like array already
           if (
-            post.likes.filter(like => like.user.toString() === req.user.id)
-              .length > 0
+            selling.watchers.filter(
+              watch => watch.user.toString() === req.user.id
+            ).length > 0
           ) {
             return res
               .status(400)
-              .json({ alreadyliked: "User has already liked this post!" });
+              .json({ alreadyWatching: "User is already watching this item." });
           }
           // add a user id to the likes array
-          post.likes.unshift({ user: req.user.id });
-          //save post and return new updated post with added like
-          post.save().then(post => res.json(post));
+          selling.watchers.unshift({ user: req.user.id });
+          //save selling and return new updated selling with added like
+          selling.save().then(selling => res.json(selling));
+          // profile.watching.unshift({sellingId: selling._id})`
+          // profile.save().then(profile => res.json(profile));
         })
-        .catch(err => res.status(404).json({ error: "No post found!" }));
+        .catch(err => res.status(404).json({ error: "No item found!" }));
     });
   }
 );
 
-// @route   POST /api/selling/unlike/:id
+// @route   POST /api/selling/unwatching/:id
 // @desc   unlike a post by id
 // @access   private
 router.post(
-  "/unlike/:id",
+  "/unwatching/:id",
   jsonParser,
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Profile.findOne({ user: req.user.id }).then(profile => {
-      Post.findById(req.params.id)
-        .then(post => {
+      Selling.findById(req.params.id)
+        .then(selling => {
           //this checks to see if users id is not in like array
           if (
-            post.likes.filter(like => like.user.toString() === req.user.id)
+            selling.watchers.filter(watch => watch.user.toString() === req.user.id)
               .length === 0
           ) {
             return res
               .status(400)
-              .json({ notliked: "User has not yet liked this post!" });
+              .json({ notWatched: "User has not yet watched this item!" });
           }
-          // map through like array, get index by id
-          const removeIndex = post.likes
+          const removeIndex = selling.watchers
             .map(item => item.user.toString())
             .indexOf(req.user.id);
-          //remove from like array by index
-          post.likes.splice(removeIndex, 1);
-          //save post, then return it
-          post.save().then(post => res.json(post));
+          selling.watchers.splice(removeIndex, 1);
+          selling.save().then(selling => res.json(selling));
         })
-        .catch(err => res.status(404).json({ error: "No post found!" }));
+        .catch(err => res.status(404).json({ error: "No item found!" }));
     });
   }
 );
 
 // @route   POST /api/selling/comment/:id
-// @desc   comment on a post by id
+// @desc   comment on a item by id
 // @access   private
 router.post(
   "/comment/:id",
@@ -178,20 +183,17 @@ router.post(
     if (!isValid) {
       return res.status(400).json(errors);
     }
-    Post.findById(req.params.id)
-      .then(post => {
-        //sets comment from post data in body, and id from user id
+    Selling.findById(req.params.id)
+      .then(sell => {
         const newComment = {
           text: req.body.text,
           name: req.user.name,
           user: req.user.id
         };
-        // add to comments array on post
-        post.comments.unshift(newComment);
-        //save post with added comment the return post
-        post.save().then(post => res.json(post));
+        sell.comments.unshift(newComment);
+        sell.save().then(sell => res.json(sell));
       })
-      .catch(err => res.status(404).json({ error: "No post found!" }));
+      .catch(err => res.status(404).json({ error: "No item found!" }));
   }
 );
 
@@ -202,11 +204,11 @@ router.delete(
   "/comment/:id/:comment_id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    Post.findById(req.params.id)
-      .then(post => {
+    Selling.findById(req.params.id)
+      .then(sell => {
         //check if comment does not exist in post.comments array
         if (
-          post.comments.filter(
+          sell.comments.filter(
             comment => comment._id.toString() === req.params.comment_id
           ).length === 0
         ) {
@@ -214,15 +216,13 @@ router.delete(
             .status(404)
             .json({ commentdoesntexist: "No comment found!" });
         }
-        //get the index of the comment to remove by params comment_id
-        const removeIndex = post.comments
+        const removeIndex = sell.comments
           .map(item => item._id.toString())
           .indexOf(req.params.comment_id);
-        // remove comment from comments array then save and return updated post
-        post.comments.splice(removeIndex, 1);
-        post.save().then(post => res.json(post));
+        sell.comments.splice(removeIndex, 1);
+        sell.save().then(sell => res.json(sell));
       })
-      .catch(err => res.status(404).json({ error: "No post found!" }));
+      .catch(err => res.status(404).json({ error: "No item found!" }));
   }
 );
 
@@ -235,11 +235,10 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Profile.findOne({ user: req.user.id }).then(profile => {
-      Post.findById(req.params.id)
-        .then(post => {
-          //check if comment does not exist in post.comments array
+      Selling.findById(req.params.id)
+        .then(sell => {
           if (
-            post.comments.filter(
+            sell.comments.filter(
               comment => comment._id.toString() === req.params.comment_id
             ).length === 0
           ) {
@@ -247,15 +246,13 @@ router.post(
               .status(404)
               .json({ commentdoesntexist: "No comment found!" });
           }
-
           //get the index of the comment to like by params comment_id
-          const likeIndex = post.comments
+          const likeIndex = sell.comments
             .map(item => item._id.toString())
             .indexOf(req.params.comment_id);
-
           //this checks to see if users id is in like array already
           if (
-            post.comments[likeIndex].likes.filter(
+            sell.comments[likeIndex].likes.filter(
               like => like.user.toString() === req.user.id
             ).length > 0
           ) {
@@ -264,11 +261,10 @@ router.post(
               .json({ alreadyliked: "User has already liked this comment!" });
           }
           // add a user id to the likes array
-          post.comments[likeIndex].likes.unshift({ user: req.user.id });
-          //save post and return new updated post with added like
-          post.save().then(post => res.json(post));
+          sell.comments[likeIndex].likes.unshift({ user: req.user.id });
+          sell.save().then(sell => res.json(sell));
         })
-        .catch(err => res.status(404).json({ error: "No post found!" }));
+        .catch(err => res.status(404).json({ error: "No item found!" }));
     });
   }
 );
@@ -282,11 +278,10 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Profile.findOne({ user: req.user.id }).then(profile => {
-      Post.findById(req.params.id)
-        .then(post => {
-          //check if comment does not exist in post.comments array
+      Selling.findById(req.params.id)
+        .then(sell => {
           if (
-            post.comments.filter(
+            sell.comments.filter(
               comment => comment._id.toString() === req.params.comment_id
             ).length === 0
           ) {
@@ -296,29 +291,28 @@ router.post(
           }
 
           //get the index of the comment to unlike by params comment_id
-          const unlikeIndex = post.comments
+          const unlikeIndex = sell.comments
             .map(item => item._id.toString())
             .indexOf(req.params.comment_id);
 
           //this checks to see if users id is not in like array
           if (
-            post.comments[unlikeIndex].likes.filter(like => like.user.toString() === req.user.id)
-              .length === 0
+            sell.comments[unlikeIndex].likes.filter(
+              like => like.user.toString() === req.user.id
+            ).length === 0
           ) {
             return res
               .status(400)
               .json({ notliked: "User has not yet liked this post!" });
           }
           // map through like array, get index by id
-          const removeIndex = post.comments[unlikeIndex].likes
+          const removeIndex = sell.comments[unlikeIndex].likes
             .map(item => item.user.toString())
             .indexOf(req.user.id);
-          //remove from like array by index
-          post.comments[unlikeIndex].likes.splice(removeIndex, 1);
-          //save post, then return it
-          post.save().then(post => res.json(post));
+          sell.comments[unlikeIndex].likes.splice(removeIndex, 1);
+          sell.save().then(sell => res.json(sell));
         })
-        .catch(err => res.status(404).json({ error: "No post found!" }));
+        .catch(err => res.status(404).json({ error: "No item found!" }));
     });
   }
 );
