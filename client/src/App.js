@@ -11,7 +11,9 @@ import store from "./store";
 //import components
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import Landing from "./components/layout/Landing";
 
+import "./App.css";
 
 //check for a login token in local storage
 if (localStorage.jwtToken) {
@@ -40,7 +42,7 @@ class App extends Component {
         <Router>
           <div className="App">
             <Navbar />
-            {/* <Route exact path="/" component={Landing} /> */}
+            <Route exact path="/" component={Landing} />
             <div className="container">
               {/* <Route exact path="/register" component={Register} />
               <Route exact path="/login" component={Login} /> */}
@@ -52,6 +54,7 @@ class App extends Component {
     );
   }
 }
+
 export default App;
 
 
