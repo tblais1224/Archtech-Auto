@@ -39,6 +39,11 @@ class Navbar extends Component {
             Dashboard
             </Link>
         </li>
+        <li className="nav-item">
+          <Link className="nav-link" to="/cart">
+            Shopping Cart
+            </Link>
+        </li>
 
         <li className="nav-item">
           <a

@@ -4,6 +4,7 @@ import { PropTypes } from "prop-types";
 import { connect } from "react-redux";
 
 class Landing extends Component {
+  
   //redirect user if logged in when mounting the component
   componentDidMount() {
     if (this.props.auth.isAuthenticated) {
@@ -21,7 +22,7 @@ class Landing extends Component {
                 <h1 className="display-3 mb-4"style={{padding:"25px"}}>Arctech Auto</h1>
                 <div className="container"><p className="lead" style={{backgroundColor:"black"}}>
                   {" "}
-                  Create a profile, sell or buy vehicles, parts, tools, etc. and interact with our friendly community of electric vehicle enthusiasts within our forum board. 
+                  Create a profile, sell or buy electric vehicles, parts, tools, etc. and interact with our friendly community of electric vehicle enthusiasts within our forum board. 
                 </p></div>
                 <hr />
                 <Link to="/register" className="btn btn-lg btn-info mr-2">
